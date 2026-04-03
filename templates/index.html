@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Traffic Monitoring Dashboard</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0f172a;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: #1e293b;
+            padding: 15px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .alert {
+            color: #ff4d4d;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #38bdf8;
+        }
+
+        pre {
+            background: #020617;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    🚦 AI Traffic & Accident Monitoring System
+</header>
+
+<div class="container">
+
+    <!-- STATUS -->
+    <div class="card">
+        <div class="section-title">🚨 Status</div>
+        <div id="status" class="alert">No incidents detected</div>
+    </div>
+
+    <!-- VEHICLE SPEEDS -->
+    <div class="card">
+        <div class="section-title">🚗 Vehicle Speeds</div>
+        <pre id="speeds">Waiting for data...</pre>
+    </div>
+
+    <!-- LOCATION -->
+    <div class="card">
+        <div class="section-title">📍 Location & Time</div>
+        <pre id="location">-</pre>
+    </div>
+
+    <!-- LLM OUTPUT -->
+    <div class="card">
+        <div class="section-title">🤖 AI Emergency Response</div>
+        <pre id="llm_output">Waiting for AI response...</pre>
+    </div>
+
+</div>
+
+<script>
+    const socket = io();
+
+    socket.on('connect', () => {
+        console.log("Connected to server");
+    });
+
+    socket.on('status_update', (data) => {
+        console.log("Received:", data);
+
+        document.getElementById('status').innerText = data.status;
+
+        document.getElementById('speeds').innerText =
+            JSON.stringify(data.vehicle_speeds, null, 2);
+
+        document.getElementById('location').innerText =
+            `Time: ${data.timestamp}\nLocation: ${data.location}`;
+
+        document.getElementById('llm_output').innerText =
+            data.llm_output || "No AI response";
+    });
+</script>
+
+</body>
+</html>
